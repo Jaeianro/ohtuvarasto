@@ -1,45 +1,60 @@
 class Varasto:
-    def __init__(self, tilavuus, alku_saldo = 0):
+    def __init__(self, tilavuus: float, alku_saldo: float = 0.0) -> None:
+        """Alustaa varaston annetulla kapasiteetilla ja alkusaldoilla."""
         if tilavuus > 0.0:
             self.tilavuus = tilavuus
         else:
-            # virheellinen, nollataan
-            self.tilavuus = 0.0
-        
+            raise ValueError("Tilavuus tulee olla suurempi kuin 0.")
+
         if alku_saldo < 0.0:
-            # virheellinen, nollataan
             self.saldo = 0.0
         elif alku_saldo <= tilavuus:
-            # mahtuu
             self.saldo = alku_saldo
         else:
-            # täyteen ja ylimäärä hukkaan!
-            self.saldo = tilavuus
+            self.saldo = tilavuus  # Asetetaan saldo täyteen kapasiteettiin
 
-    # huom: ominaisuus voidaan myös laskea. Ei tarvita erillistä kenttää viela_tilaa tms.
-    def paljonko_mahtuu(self):
+    def paljonko_mahtuu(self) -> float:
+        """Laskee, kuinka paljon lisää mahtuu varastoon."""
         return self.tilavuus - self.saldo
 
-    def lisaa_varastoon(self, maara):
+    def lisaa_varastoon(self, maara: float) -> None:
+        """Lisää tietty määrä tavaraa varastoon."""
         if maara < 0:
-            return
+            raise ValueError("Lisättävän määrän tulee olla ei-negatiivinen.")
         if maara <= self.paljonko_mahtuu():
-            self.saldo = self.saldo + maara
+            self.saldo += maara
         else:
-            self.saldo = self.tilavuus
+            raise ValueError("Ei voida lisätä, varasto täyttyisi liikaa")
 
-    def ota_varastosta(self, maara):
+    def ota_varastosta(self, maara: float) -> float:
+        """Ottaa tietyn määrän tavaraa varastosta, palauttaen todellisen otetun määrän."""
         if maara < 0:
-            return 0.0
-        if maara > self.saldo: 
+            raise ValueError("Otettavan määrän tulee olla ei-negatiivinen.")
+        if maara > self.saldo:
+            # Jos yritetään ottaa enemmän kuin on saatavilla
             kaikki_mita_voidaan = self.saldo
             self.saldo = 0.0
+            return kaikki_mita_voidaan  # Palautetaan se, mitä voidaan ottaa
 
-            return kaikki_mita_voidaan
-
-        self.saldo = self.saldo - maara
-
+        self.saldo -= maara
         return maara
+
+    def __str__(self) -> str:
+        """Palauttaa merkkijonon, joka kuvaa varaston tilaa."""
+        return f"saldo = {self.saldo}, vielä tilaa = {self.paljonko_mahtuu()}"
+
+# Esimerkki Varasto-luokan käytöstä
+varasto = Varasto(100, 50)
+print(varasto)  # saldo = 50, vielä tilaa = 50
+try:
+    varasto.lisaa_varastoon(60)  # Yritetään lisätä liikaa
+except ValueError as e:
+    print(e)  # Tulostaa virheilmoituksen
+
+varasto.lisaa_varastoon(30)  # Lisätään 30
+print(varasto)  # saldo = 80, vielä tilaa = 20
+
+removed = varasto.ota_varastosta(90)  # Yritetään ottaa liikaa
+print(f"Otettiin varastosta: {removed}")  # Otetaan vain 80, mikä on maksimimäärä
+print(varasto)  # saldo = 0, vielä tilaa = 100
     
-    def __str__(self):
-        return f"saldo = {self.saldo}, vielä tilaa {self.paljonko_mahtuu()}"
