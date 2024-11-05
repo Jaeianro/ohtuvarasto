@@ -1,1 +1,1 @@
-https://github.com/<OWNER>/<REPOSITORY>/workflows/<WORKFLOW_NAME>/badge.svg)
+https://github.com/Jaeianro/ohtuvarasto/workflows/CI/badge.svg
